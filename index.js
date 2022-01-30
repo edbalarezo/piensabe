@@ -1,21 +1,23 @@
 const express = require('express');
 const Database = require('./mysqlcon');
 const cors = require('cors')
-const port = 3001
-const app = express();
+const port = 3001;
+//Iniciamos en app el servidore web
+const app = express()
+//Agregamos CORS (politicas de seguridad)
+// PAra que otros dominios (react localhost:3000) puedan acceder a nuestros datos
 app.use(cors())
 app.use(express.json())
 
-app.get('/', (req, res)=>{
+app.get('/', (req, res) => {
     res.send('Servidor OK !!!');
 })
 
-app.get('/cards', (req, res) => 
-{
+app.get('/cards', (req, res) => {
     const db = new Database()
     const cn = db.getConnection()
     cn.execute(
-        'SELECT * FROM alumnos', [],
+        'SELECT * FROM alumno', [],
         function (err, results, fields) {
             res.json(results)
         }
@@ -23,12 +25,13 @@ app.get('/cards', (req, res) =>
 
 })
 
-app.get('/cards/:id_alumno', (req, res) => {
-    const { id_alumno } = req.params;
+// Obtener solo un profesor
+app.get('/cards/:id', (req, res) => {
+    const { id } = req.params;
     const db = new Database()
     const cn = db.getConnection()
     cn.execute(
-        'SELECT * FROM alumnos WHERE id = ?', [id_alumno],
+        'SELECT * FROM alumno WHERE id = ?', [id],
         function (err, results, fields) {
             res.json(results[0])
         }
@@ -36,18 +39,19 @@ app.get('/cards/:id_alumno', (req, res) => {
 
 })
 
- app.post('./cards',(req, res) => {
+                    //REquest peticion     response  response
+app.post('/cards', (req, res) => {
     const body = req.body;
     console.log (body);
     const db = new Database()
     const cn = db.getConnection()
 
-    const query = `INSERT INTO ALUMNOS    
-                (id_alumno, nombre, apellidos, fech_nac) VALUES
-                 (?,?,?,?)`;
+    const query = `INSERT INTO ALUMNO     
+                (id, nombre, apellido1, apellido2, discapacidad_fisica, telefono) VALUES
+                 (?,?,?,?,?,?)`;
 
     cn.execute(
-        query, [body.id_alumno, body.nombre, body.apellidos, body.fech_nac],
+        query, [body.id, body.nombre, body.apellido1, body.apellido2, body.discapacidad_fisica, body.telefono],
         function (err, results, fields) {
             if (err) {
                 res.status(500).json({
@@ -61,17 +65,18 @@ app.get('/cards/:id_alumno', (req, res) => {
     );
 })
 
+//update
 app.put('/cards', (req, res) => {
     const body = req.body;
     console.log (body);
     const db = new Database()
     const cn = db.getConnection()
 
-    const query = `UPDATE ALUMNOS 
-               SET nombre=?, apellidos=?, fecha_nac=?
-               WHERE id_alumno = ?`;
+    const query = `UPDATE PROFESOR     
+                SET nombre=?, apellido1=?, apellido2=?, discapacidad_fisica=?, telefono=? 
+                WHERE id = ?`;
     cn.execute(
-        query, [body.nombre, apellidos, body.fech_nac],
+        query, [body.nombre, body.apellido1, body.apellido2, body.discapacidad_fisica, body.telefono, body.id],
         function (err, results, fields) {
             if (err) {
                 res.status(500).json({
@@ -83,10 +88,9 @@ app.put('/cards', (req, res) => {
             }
         }
     );
-});
+})
+//Habilitamos el servidor en el puerto indicado
+//En esta caso sera 3001 porque el 3000 ya es usado por React
 app.listen(port, () => {
-    console.log('Servidor Express en: http://localhost:'+ port)
-
-
-}
-)
+    console.log('Sevidor Express en: http://localhost:' + port);
+})
