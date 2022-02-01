@@ -37,6 +37,43 @@ app.get('/cards/:id', (req, res) => {
 
 })
 
+app.get('/cards', (req, res) => {
+    const db = new Database()
+    const cn = db.getConnection()
+    cn.execute(
+        'SELECT * FROM usuarios', [],
+        function (err, results, fields) {
+            res.json(results)
+        }
+    );
+
+})
+
+app.post('/cards', (req, res) => {
+    const body = req.body;
+    console.log (body);
+    const db = new Database()
+    const cn = db.getConnection()
+
+    const query = `INSERT INTO USUARIOS     
+                (id, ussername, password, status) VALUES
+                 (?,?,?,?)`;
+
+    cn.execute(
+        query, [body.id, body.ussername, body.password, body.status],
+        function (err, results, fields) {
+            if (err) {
+                res.status(500).json({
+                    message: err.message
+                })
+            }
+            else {
+                res.json(body)
+            }
+        }
+    );
+})
+
 app.post('/cards', (req, res) => {
     const body = req.body;
     console.log (body);
