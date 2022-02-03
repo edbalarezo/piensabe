@@ -51,7 +51,7 @@ app.post('/cards', (req, res) => {
 
 })
 
-app.get('/cards', (req, res)=>
+app.get('/usuario', (req, res)=>
 { 
     const db= new Database()
     const cn=db.getConnection()
@@ -64,7 +64,7 @@ app.get('/cards', (req, res)=>
  
 })
 
-app.post('/cards', (req, res) => {
+app.post('/usuario', (req, res) => {
 
     const body = req.body;
     const db = new Database()
@@ -74,7 +74,7 @@ app.post('/cards', (req, res) => {
                  (?,?,?,?)`  
                  
     cn.execute(
-        query, [body,id, body.username, body.password, body.status],
+        query, [body.id, body.username, body.password, body.status],
         function (err, results, fields) {
             if (err) {
                 res.status(500).json({
